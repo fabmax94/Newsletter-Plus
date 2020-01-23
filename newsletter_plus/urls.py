@@ -17,9 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from newsletter import views
-router = routers.DefaultRouter()                      # add this
-router.register(r'news', views.NewsView, 'news')
+from django.conf.urls.static import static
+from newsletter_plus import settings
+
+router = routers.DefaultRouter()
+router.register(r'news/last', views.LastNewsView, 'news_last')
+router.register(r'news/best', views.BestNewsView, 'news_best')
 urlpatterns = [
-    path('admin/', admin.site.urls),
-         path('api/', include(router.urls))
-]
+                  path('admin/', admin.site.urls),
+                  path('api/', include(router.urls))
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

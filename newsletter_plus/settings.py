@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'newsletter_plus', '')
+MEDIA_URL = '/media/'
+
+print(MEDIA_ROOT)
 
 # Application definition
 
