@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import axios from 'axios';
+
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
@@ -20,37 +21,23 @@ import styles from "assets/jss/material-kit-react/views/landingPage.js";
 // Sections for this page
 import NewsLandingSection from "./Sections/NewsLandingSection.js";
 
-;
 
 const dashboardRoutes = [];
 
 const useStyles = makeStyles(styles);
 
-export default function HomePage(props) {
+export default function NewsPage(props) {
     const classes = useStyles();
-    const [lastNews, setLastNews] = useState([]);
-    const [bestNews, setBestNews] = useState([]);
+    const [news, setNews] = useState({});
     const {...rest} = props;
+    const {id} = props.match.params;
 
-    const loadNews = (typeNews) => {
-        switch (typeNews) {
-            case 'last':
-                axios.get('http://127.0.0.1:8000/api/news/last').then((response => setLastNews(response.data)));
-                break;
-            case 'best':
-                axios.get('http://127.0.0.1:8000/api/news/best').then((response => setBestNews(response.data)));
-                break;
-            default:
-                break;
-        }
-    };
 
-    const showNews = (id) => {
-        props.history.push(`/news/${id}`);
-    };
     useEffect(() => {
-        loadNews('last');
-        loadNews('best');
+        axios.get(`http://127.0.0.1:8000/api/news/get?id=${id}`).then((response => {
+            document.getElementById("news-container").innerHTML = response.data[0].content;
+        }));
+
     }, []);
 
     return (
@@ -83,9 +70,8 @@ export default function HomePage(props) {
                 </div>
             </Parallax>
             <div className={classNames(classes.main, classes.mainRaised)}>
-                <div className={classes.container}>
-                    <NewsLandingSection section={"Last News"} items={lastNews} onHandleShowNews={showNews}/>
-                    <NewsLandingSection section={"Best News"} items={bestNews} onHandleShowNews={showNews}/>
+                <div className={classes.container} id={"news-container"}>
+
                 </div>
             </div>
             <Footer/>

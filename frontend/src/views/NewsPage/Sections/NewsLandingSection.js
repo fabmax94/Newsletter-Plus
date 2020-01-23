@@ -22,14 +22,14 @@ import team3 from "assets/img/faces/kendall.jpg";
 
 const useStyles = makeStyles(styles);
 
-const NewsLandingSection = ({section, items, onHandleShowNews}) => {
+const NewsLandingSection = ({section, items}) => {
     const classes = useStyles();
     const imageClasses = classNames(
         classes.imgRaised,
         classes.imgRoundedCircle,
         classes.imgFluid
     );
-    console.log(items);
+
     return (
         <div className={classes.section}>
             <h2 className={classes.title}>{section}</h2>
@@ -37,7 +37,7 @@ const NewsLandingSection = ({section, items, onHandleShowNews}) => {
                 <GridContainer>
                     {items.map(item => {
                         return (<GridItem xs={12} sm={12} md={4}>
-                            <Card plain onClick={() => onHandleShowNews(item.id)}>
+                            <Card plain>
                                 <GridItem xs={12} sm={12} md={6} className={classes.itemGrid}>
                                     {
                                         item.image ? <img src={item.image} alt="..." className={imageClasses}/> :
