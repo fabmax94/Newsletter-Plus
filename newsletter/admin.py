@@ -1,6 +1,4 @@
 from django.contrib import admin
 
-from newsletter.models import News, Link
+from newsletter.models import News
 admin.site.register(News)
-admin.site.register(Link)
-# Register your models here.

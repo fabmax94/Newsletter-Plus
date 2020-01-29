@@ -35,10 +35,10 @@ export default function HomePage(props) {
     const loadNews = (typeNews) => {
         switch (typeNews) {
             case 'last':
-                axios.get('http://127.0.0.1:8000/api/news/last').then((response => setLastNews(response.data)));
+                axios.get('http://192.168.0.18:8800/api/news/last').then((response => setLastNews(response.data)));
                 break;
             case 'best':
-                axios.get('http://127.0.0.1:8000/api/news/best').then((response => setBestNews(response.data)));
+                axios.get('http://192.168.0.18:8800/api/news/best').then((response => setBestNews(response.data)));
                 break;
             default:
                 break;
