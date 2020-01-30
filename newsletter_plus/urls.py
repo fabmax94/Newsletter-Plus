@@ -26,5 +26,6 @@ router.register(r'news/best', views.BestNewsView, 'news_best')
 router.register(r'news/get', views.NewsView, 'news_get')
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('api/', include(router.urls))
+                  path('api/', include(router.urls)),
+                  path('news/save', views.save_news) # TODO: fazer esse request com rest_framework depois
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
