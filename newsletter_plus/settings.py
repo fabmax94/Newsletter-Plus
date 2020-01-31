@@ -25,7 +25,7 @@ SECRET_KEY = 'm$i4ilkdii^h5e=r0bg0!*5dm-&ld#krk9usol(85rn^1*f=6e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.18']
+ALLOWED_HOSTS = []
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'newsletter_plus', '')
 MEDIA_URL = '/media/'
@@ -134,3 +134,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 PATH_PROJECT = os.path.abspath(os.path.dirname(__name__))
+
+import django_heroku
+django_heroku.settings(locals())

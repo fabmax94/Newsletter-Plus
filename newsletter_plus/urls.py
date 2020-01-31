@@ -22,7 +22,6 @@ from newsletter_plus import settings
 
 router = routers.DefaultRouter()
 router.register(r'news/last', views.LastNewsView, 'news_last')
-router.register(r'news/best', views.BestNewsView, 'news_best')
 router.register(r'news/get', views.NewsView, 'news_get')
 urlpatterns = [
                   path('admin/', admin.site.urls),

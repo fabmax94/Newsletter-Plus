@@ -37,7 +37,7 @@ const NewsLandingSection = ({section, items, onHandleShowNews}) => {
                 <GridContainer>
                     {items.map(item => {
                         return (<GridItem xs={12} sm={12} md={4}>
-                            <Card plain onClick={() => onHandleShowNews(item.id)}>
+                            <Card plain onClick={() => onHandleShowNews(item.id)} style={{"cursor": "pointer"}}>
                                 <GridItem xs={12} sm={12} md={6} className={classes.itemGrid}>
                                     {
                                         item.image ? <img src={item.image} alt="..." className={imageClasses}/> :

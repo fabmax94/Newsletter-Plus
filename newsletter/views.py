@@ -10,12 +10,10 @@ from django.http import JsonResponse
 
 class LastNewsView(viewsets.ModelViewSet):
     serializer_class = NewsSerializer
-    queryset = News.objects.all().order_by('-date')[:10]
+    def get_queryset(self):
+        portal = self.request.query_params.get('portal')
 
-
-class BestNewsView(viewsets.ModelViewSet):
-    serializer_class = NewsSerializer
-    queryset = News.objects.all().order_by('-likes')[:10]
+        return News.objects.filter(portal=portal).order_by('-date')[:10]
 
 
 class NewsView(viewsets.ModelViewSet):
@@ -36,7 +34,7 @@ def save_news(request):
             return JsonResponse({"message": "already exist"})    
         News.objects.create(title=data["title"], content=data["content"], description=data["description"],
                                 author=data['author'], date=datetime.now(), likes=0,
-                                image_path=data["image"])
+                                image_path=data["image"], portal=data['portal'])
         
         return JsonResponse({"message": "Success"})
     except Exception as exc:

@@ -34,7 +34,7 @@ export default function NewsPage(props) {
 
 
     useEffect(() => {
-        axios.get(`http://192.168.0.18:8800/api/news/get?id=${id}`).then((response => {
+        axios.get(`http://127.0.0.1:8000/api/news/get?id=${id}`).then((response => {
             document.getElementById("news-container").innerHTML = response.data[0].content;
         }));
 

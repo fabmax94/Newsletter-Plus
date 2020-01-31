@@ -29,16 +29,12 @@ const useStyles = makeStyles(styles);
 export default function HomePage(props) {
     const classes = useStyles();
     const [lastNews, setLastNews] = useState([]);
-    const [bestNews, setBestNews] = useState([]);
     const {...rest} = props;
 
     const loadNews = (typeNews) => {
         switch (typeNews) {
-            case 'last':
-                axios.get('http://192.168.0.18:8800/api/news/last').then((response => setLastNews(response.data)));
-                break;
-            case 'best':
-                axios.get('http://192.168.0.18:8800/api/news/best').then((response => setBestNews(response.data)));
+            case 'medium':
+                axios.get('http://127.0.0.1:8000/api/news/last?portal=medium').then((response => setLastNews(response.data)));
                 break;
             default:
                 break;
@@ -49,8 +45,7 @@ export default function HomePage(props) {
         props.history.push(`/news/${id}`);
     };
     useEffect(() => {
-        loadNews('last');
-        loadNews('best');
+        loadNews('medium');
     }, []);
 
     return (
@@ -84,8 +79,7 @@ export default function HomePage(props) {
             </Parallax>
             <div className={classNames(classes.main, classes.mainRaised)}>
                 <div className={classes.container}>
-                    <NewsLandingSection section={"Last News"} items={lastNews} onHandleShowNews={showNews}/>
-                    <NewsLandingSection section={"Best News"} items={bestNews} onHandleShowNews={showNews}/>
+                    <NewsLandingSection section={"Medium"} items={lastNews} onHandleShowNews={showNews}/>
                 </div>
             </div>
             <Footer/>
