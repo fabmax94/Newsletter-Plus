@@ -137,3 +137,6 @@ PATH_PROJECT = os.path.abspath(os.path.dirname(__name__))
 
 import django_heroku
 django_heroku.settings(locals())
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
