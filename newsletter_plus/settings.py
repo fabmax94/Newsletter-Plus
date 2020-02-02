@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,12 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'm$i4ilkdii^h5e=r0bg0!*5dm-&ld#krk9usol(85rn^1*f=6e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
-
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'newsletter_plus', '')
-MEDIA_URL = '/media/'
 
 
 # Application definition
@@ -43,12 +41,6 @@ INSTALLED_APPS = [
     'newsletter.apps.NewsletterConfig',
     'corsheaders',
     'rest_framework'
-]
-
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'http://localhost:8080',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +127,7 @@ STATIC_URL = '/static/'
 
 PATH_PROJECT = os.path.abspath(os.path.dirname(__name__))
 
-import django_heroku
+
 django_heroku.settings(locals())
 
 CORS_ORIGIN_ALLOW_ALL = True
