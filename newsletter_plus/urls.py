@@ -19,6 +19,7 @@ from rest_framework import routers
 from newsletter import views
 from django.conf.urls.static import static
 from newsletter_plus import settings
+from newsletter_plus.views import RegistrationAPI, LoginAPI, UserAPI
 
 router = routers.DefaultRouter()
 router.register(r'news/last', views.LastNewsView, 'news_last')
@@ -26,5 +27,9 @@ router.register(r'news/get', views.NewsView, 'news_get')
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('api/', include(router.urls)),
+                  path("auth/register", RegistrationAPI.as_view()),
+                  path("auth/login", LoginAPI.as_view()),
+                  path('api/auth', include('knox.urls')),
+                  path("auth/user", UserAPI.as_view()),
                   path('news/save', views.save_news) # TODO: fazer esse request com rest_framework depois
               ]
