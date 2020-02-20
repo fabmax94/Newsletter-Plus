@@ -24,6 +24,9 @@ from newsletter_plus.views import RegistrationAPI, LoginAPI, UserAPI
 router = routers.DefaultRouter()
 router.register(r'news/last', views.LastNewsView, 'news_last')
 router.register(r'news/get', views.NewsView, 'news_get')
+router.register(r'bookmark/get', views.BookmarkView, 'bookmark_get')
+router.register(r'bookmark/save', views.BookmarkSaveView, 'bookmark_save')
+
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('api/', include(router.urls)),

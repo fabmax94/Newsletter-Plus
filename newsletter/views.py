@@ -1,11 +1,12 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from .models import News
+from .models import News, Bookmark
 from .serializers import NewsSerializer
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
+from django.contrib.auth.decorators import login_required
 
 
 class LastNewsView(viewsets.ModelViewSet):
@@ -15,6 +16,39 @@ class LastNewsView(viewsets.ModelViewSet):
 
         return News.objects.filter(portal=portal).order_by('-date')[:10]
 
+
+
+class BookmarkSaveView(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def create(self, request): # Here is the new update comes <<<<
+        post_data = request.data
+        news_id = post_data.get("news_id", None)
+        if not News.objects.filter(id=int(news_id)).exists():
+            return HttpResponseNotFound()
+        
+        news = News.objects.get(id=news_id)
+        bookmark = None
+        if Bookmark.objects.filter(user=request.user).exists():
+            bookmark = Bookmark.objects.get(user=request.user)
+        else:
+            bookmark = Bookmark.objects.create(
+                user=request.user
+            )
+        
+        bookmark.news.add(news)
+        bookmark.save()
+        return HttpResponse()
+
+class BookmarkView(viewsets.ModelViewSet):
+    serializer_class = NewsSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
+    def get_queryset(self):
+        if Bookmark.objects.filter(user=self.request.user).exists():
+            return Bookmark.objects.get(user=self.request.user).news.all()
+        
+        return []
+    
 
 class NewsView(viewsets.ModelViewSet):
     serializer_class = NewsSerializer

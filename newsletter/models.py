@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from newsletter_plus.settings import PATH_PROJECT
 
 
+
 class News(models.Model):
     title = models.CharField(max_length=250)
     content = models.TextField()
@@ -21,3 +22,8 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Bookmark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
+    news = models.ManyToManyField(News)
