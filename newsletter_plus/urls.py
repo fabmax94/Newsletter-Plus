@@ -28,11 +28,12 @@ router.register(r'bookmark/get', views.BookmarkView, 'bookmark_get')
 router.register(r'bookmark/save', views.BookmarkSaveView, 'bookmark_save')
 
 urlpatterns = [
-                  path('admin/', admin.site.urls),
-                  path('api/', include(router.urls)),
-                  path("auth/register", RegistrationAPI.as_view()),
-                  path("auth/login", LoginAPI.as_view()),
-                  path('api/auth', include('knox.urls')),
-                  path("auth/user", UserAPI.as_view()),
-                  path('news/save', views.save_news) # TODO: fazer esse request com rest_framework depois
-              ]
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path("auth/register", RegistrationAPI.as_view()),
+    path("auth/login", LoginAPI.as_view()),
+    path('api/auth', include('knox.urls')),
+    path("auth/user", UserAPI.as_view()),
+    # TODO: fazer esse request com rest_framework depois
+    path('news/save', views.save_news)
+]
