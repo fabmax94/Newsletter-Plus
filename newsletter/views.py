@@ -24,6 +24,7 @@ class NewsListView(viewsets.ModelViewSet):
 
         return news
 
+
 class PortalListView(viewsets.ModelViewSet):
     serializer_class = PortalSerializer
     queryset = Portal.objects.all()
