@@ -4,20 +4,29 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from .models import News, Bookmark
-from .serializers import NewsSerializer
+from .models import News, Bookmark, Portal
+from .serializers import NewsSerializer, PortalSerializer
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 
 
-class LastNewsView(viewsets.ModelViewSet):
+class NewsListView(viewsets.ModelViewSet):
     serializer_class = NewsSerializer
 
     def get_queryset(self):
         portal = self.request.query_params.get('portal')
 
-        return News.objects.filter(portal=portal).order_by('-date')[:10]
+        news = News.objects.filter(portal__name=portal).order_by('-date')
+
+        if self.request.query_params.get('last'):
+            return news[:10]
+
+        return news
+
+class PortalListView(viewsets.ModelViewSet):
+    serializer_class = PortalSerializer
+    queryset = Portal.objects.all()
 
 
 class BookmarkUpdateView(viewsets.ViewSet):
@@ -52,9 +61,14 @@ class NewsSaveView(viewsets.ViewSet):
             data = request.data
             if News.objects.filter(title=data['title']).exists():
                 return JsonResponse({"message": "already exist"})
+
+            if not Portal.objects.filter(name=data['portal']).exists():
+                return JsonResponse({"message": "portal is not exist"})
+
+            portal = Portal.objects.get(name=data['portal'])
             News.objects.create(title=data["title"], content=data["content"], description=data["description"],
                                 author=data['author'], date=datetime.now(), likes=0,
-                                image_path=data["image"], portal=data['portal'])
+                                image_path=data["image"], portal=portal, url=data['url'])
             return JsonResponse({"message": "Success"})
         except Exception as exc:
             print(str(exc))

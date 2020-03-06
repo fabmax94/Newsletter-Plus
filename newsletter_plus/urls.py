@@ -22,7 +22,8 @@ from newsletter_plus import settings
 from newsletter_plus.views import RegistrationAPI, LoginAPI, UserAPI
 
 router = routers.DefaultRouter()
-router.register(r'news/last', views.LastNewsView, 'news_last')
+router.register(r'portal', views.PortalListView, 'portal_list')
+router.register(r'news', views.NewsListView, 'news_list')
 router.register(r'news/get', views.NewsView, 'news_get')
 router.register(r'news/save', views.NewsSaveView, 'news_get')
 router.register(r'bookmark/get', views.BookmarkView, 'bookmark_get')
