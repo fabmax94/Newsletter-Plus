@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponseNotFound
 from django.contrib.auth.models import User
 from datetime import datetime
 
@@ -11,27 +12,20 @@ from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 
 
-class NewsListView(viewsets.ModelViewSet):
-    serializer_class = NewsSerializer
-
-    def get_queryset(self):
-        portal = self.request.query_params.get('portal')
-
-        news = News.objects.filter(portal__name=portal).order_by('-date')
-
-        if self.request.query_params.get('last'):
-            return news[:10]
-
-        return news
-
-
-class PortalListView(viewsets.ModelViewSet):
+class PortalView(viewsets.ModelViewSet):
     serializer_class = PortalSerializer
     queryset = Portal.objects.all()
 
 
-class BookmarkUpdateView(viewsets.ViewSet):
+class BookmarkView(viewsets.ModelViewSet):
+    serializer_class = NewsSerializer
     permission_classes = [permissions.IsAuthenticated, ]
+
+    def list(self, request):
+        if Bookmark.objects.filter(user=request.user).exists():
+            return Bookmark.objects.get(user=request.user).news.all()
+
+        return []
 
     def create(self, request):
         post_data = request.data
@@ -56,7 +50,38 @@ class BookmarkUpdateView(viewsets.ViewSet):
         return HttpResponse()
 
 
-class NewsSaveView(viewsets.ViewSet):
+class NewsView(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny, ]
+
+    serializer_class = NewsSerializer
+
+    def list(self, request):
+        portal = request.query_params.get('portal')
+
+        news = News.objects.filter(portal__name=portal).order_by('-date')
+
+        if request.query_params.get('last'):
+            return news[:10]
+
+        return JsonResponse({"news": [NewsSerializer(item).data for item in news]})
+
+    def retrieve(self, request, pk):
+        user = self.request.user
+        if not user.is_authenticated or not News.objects.filter(pk=pk).exists():
+            return HttpResponseNotFound()
+        id_data = int(pk)
+        if Bookmark.objects.filter(user=user).exists():
+            bookmark = Bookmark.objects.get(user=user)
+            is_bookmark = any(
+                [news.id == id_data for news in bookmark.news.all()])
+        else:
+            is_bookmark = False
+
+        news = News.objects.get(pk=pk)
+        result = dict(NewsSerializer(news).data)
+        result.update({"is_bookmark": is_bookmark})
+        return JsonResponse(result)
+
     def create(self, request):
         try:
             data = request.data
@@ -74,34 +99,3 @@ class NewsSaveView(viewsets.ViewSet):
         except Exception as exc:
             print(str(exc))
             return JsonResponse({"message": str(exc)})
-
-
-class BookmarkView(viewsets.ModelViewSet):
-    serializer_class = NewsSerializer
-    permission_classes = [permissions.IsAuthenticated, ]
-
-    def get_queryset(self):
-        if Bookmark.objects.filter(user=self.request.user).exists():
-            return Bookmark.objects.get(user=self.request.user).news.all()
-
-        return []
-
-
-class NewsView(viewsets.ViewSet):
-    permission_classes = [permissions.IsAuthenticated, ]
-
-    def retrieve(self, request, pk):
-        user = self.request.user
-        id_data = int(pk)
-        if Bookmark.objects.filter(user=user).exists():
-            bookmark = Bookmark.objects.get(user=user)
-            is_bookmark = any(
-                [news.id == id_data for news in bookmark.news.all()])
-        else:
-            is_bookmark = False
-
-        queryset = News.objects.all()
-        news = get_object_or_404(queryset, pk=pk)
-        result = dict(NewsSerializer(news).data)
-        result.update({"is_bookmark": is_bookmark})
-        return JsonResponse(result)
