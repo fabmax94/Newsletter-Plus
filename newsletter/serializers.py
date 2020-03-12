@@ -6,7 +6,7 @@ class NewsSerializer(serializers.ModelSerializer):
     portal_name = serializers.CharField(source='portal.name')
     class Meta:
         model = News
-        fields = ('id', 'title', 'content', 'date', 'author', 'description', 'image', 'image_path', 'portal_name')
+        fields = ('id', 'title', 'content', 'date', 'author', 'description', 'image', 'image_path', 'portal_name', 'url')
 
 
 class PortalSerializer(serializers.ModelSerializer):
