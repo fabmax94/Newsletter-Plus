@@ -67,15 +67,18 @@ class NewsView(viewsets.ViewSet):
 
     def retrieve(self, request, pk):
         user = self.request.user
-        if not user.is_authenticated or not News.objects.filter(pk=pk).exists():
+        if not News.objects.filter(pk=pk).exists():
             return HttpResponseNotFound()
+        
+        is_bookmark = False
         id_data = int(pk)
-        if Bookmark.objects.filter(user=user).exists():
-            bookmark = Bookmark.objects.get(user=user)
-            is_bookmark = any(
-                [news.id == id_data for news in bookmark.news.all()])
-        else:
-            is_bookmark = False
+        
+        if user.is_authenticated:
+            if Bookmark.objects.filter(user=user).exists():
+                bookmark = Bookmark.objects.get(user=user)
+                is_bookmark = any(
+                    [news.id == id_data for news in bookmark.news.all()])
+        
 
         news = News.objects.get(pk=pk)
         result = dict(NewsSerializer(news).data)
