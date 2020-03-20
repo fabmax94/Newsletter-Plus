@@ -10,6 +10,7 @@ from .serializers import NewsSerializer, PortalSerializer
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
+from itertools import groupby
 
 
 class PortalView(viewsets.ModelViewSet):
@@ -58,27 +59,31 @@ class NewsView(viewsets.ViewSet):
     def list(self, request):
         portal = request.query_params.get('portal')
 
-        news = News.objects.filter(portal__name=portal).order_by('-date')
+        if request.query_params.get('portal'):
+            news = News.objects.filter(portal__name=portal)
+        else:
+            news = News.objects.all()
+
+        result = news.order_by('-date')
 
         if request.query_params.get('last'):
-            return news[:10]
+            result = result[:10]
 
-        return JsonResponse({"news": [NewsSerializer(item).data for item in news]})
+        return JsonResponse({"news": [NewsSerializer(item).data for item in result]})
 
     def retrieve(self, request, pk):
         user = self.request.user
         if not News.objects.filter(pk=pk).exists():
             return HttpResponseNotFound()
-        
+
         is_bookmark = False
         id_data = int(pk)
-        
+
         if user.is_authenticated:
             if Bookmark.objects.filter(user=user).exists():
                 bookmark = Bookmark.objects.get(user=user)
                 is_bookmark = any(
                     [news.id == id_data for news in bookmark.news.all()])
-        
 
         news = News.objects.get(pk=pk)
         result = dict(NewsSerializer(news).data)
