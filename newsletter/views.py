@@ -24,9 +24,9 @@ class BookmarkView(viewsets.ModelViewSet):
 
     def list(self, request):
         if Bookmark.objects.filter(user=request.user).exists():
-            return Bookmark.objects.get(user=request.user).news.all()
+            return JsonResponse({"bookmarks": [NewsSerializer(item).data for item in Bookmark.objects.get(user=request.user).news.all()]})
 
-        return []
+        return JsonResponse({"bookmarks": []})
 
     def create(self, request):
         post_data = request.data
