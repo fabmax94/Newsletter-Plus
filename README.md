@@ -4,3 +4,6 @@ These information are inputed by https://github.com/fabmax94/newsletter-scraping
 
 ## Technologies
 To development this server were used Python, Django and Django Rest Framework.
+
+## Demo
+http://newsletter-plus.herokuapp.com
