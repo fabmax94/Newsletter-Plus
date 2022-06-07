@@ -1,16 +1,10 @@
-from rest_framework import viewsets, permissions
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseNotFound
-from django.contrib.auth.models import User
 from datetime import datetime
+
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
+from rest_framework import viewsets, permissions
 
 from .models import News, Bookmark, Portal
 from .serializers import NewsSerializer, PortalSerializer
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
-from rest_framework.response import Response
-from django.contrib.auth.decorators import login_required
-from itertools import groupby
 
 
 class PortalView(viewsets.ModelViewSet):
@@ -23,25 +17,19 @@ class BookmarkView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def list(self, request):
-        if Bookmark.objects.filter(user=request.user).exists():
-            return JsonResponse({"bookmarks": [NewsSerializer(item).data for item in Bookmark.objects.get(user=request.user).news.all()]})
-
-        return JsonResponse({"bookmarks": []})
+        return JsonResponse({"bookmarks": [NewsSerializer(item).data for item in
+                                           Bookmark.objects.get(user=request.user).news.all()]})
 
     def create(self, request):
         post_data = request.data
-        news_id = post_data.get("news_id", None)
-        if not News.objects.filter(id=int(news_id)).exists():
+        news_id = post_data.get("news_id")
+        news = News.objects.filter(id=news_id).last()
+        if not news:
             return HttpResponseNotFound()
 
-        news = News.objects.get(id=int(news_id))
-        bookmark = None
-        if Bookmark.objects.filter(user=request.user).exists():
-            bookmark = Bookmark.objects.get(user=request.user)
-        else:
-            bookmark = Bookmark.objects.create(
-                user=request.user
-            )
+        bookmark = Bookmark.objects.get_or_create(
+            user=request.user
+        )
 
         if bookmark.news.filter(id=news.id).exists():
             bookmark.news.remove(news)
@@ -73,19 +61,18 @@ class NewsView(viewsets.ViewSet):
 
     def retrieve(self, request, pk):
         user = self.request.user
-        if not News.objects.filter(pk=pk).exists():
+        news = News.objects.filter(pk=pk).last()
+        if not news:
             return HttpResponseNotFound()
 
         is_bookmark = False
-        id_data = int(pk)
 
         if user.is_authenticated:
-            if Bookmark.objects.filter(user=user).exists():
-                bookmark = Bookmark.objects.get(user=user)
+            bookmark = Bookmark.objects.prefetch_related("news").filter(user=user).values("news").last()
+            if bookmark:
                 is_bookmark = any(
-                    [news.id == id_data for news in bookmark.news.all()])
+                    [n == news for n in bookmark["news"]])
 
-        news = News.objects.get(pk=pk)
         result = dict(NewsSerializer(news).data)
         result.update({"is_bookmark": is_bookmark})
         return JsonResponse(result)
